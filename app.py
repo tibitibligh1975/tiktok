@@ -18,10 +18,7 @@ def home():
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    # Recebe o webhook do TikTok
-    data = request.json
-    
-    # Adiciona timestamp do comentário
+    # Adiciona timestamp do comentário independente do formato dos dados
     comentarios.append(datetime.now())
     
     # Emite evento para atualizar o gráfico
