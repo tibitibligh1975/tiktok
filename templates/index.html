@@ -1,31 +1,153 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Monitor de Comentários TikTok</title>
+    <title>Placar TikTok</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #010101;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .placar {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .time {
+            width: 45%;
+        }
+
+        .time-nome {
+            color: #fff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .pontos {
+            font-size: 3em;
+            color: #fe2c55;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .barra-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .barra {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(45deg, #fe2c55, #69c9d0);
+            transition: height 0.5s ease-out;
+            border-radius: 10px;
+        }
+
+        .ponto-animacao {
+            position: absolute;
+            color: #fe2c55;
+            font-size: 24px;
+            font-weight: bold;
+            animation: subir 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes subir {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Monitor de Comentários TikTok</h1>
-    <img id="grafico" src="" alt="Gráfico de comentários">
+    <div class="container">
+        <h1 class="title">⭐ Placar da Live ⭐</h1>
+        <div class="placar">
+            <div class="time">
+                <div class="time-nome">Time A</div>
+                <div class="pontos" id="pontosA">{{ time_a }}</div>
+                <div class="barra-container">
+                    <div class="barra" id="barraA" style="height: 0%"></div>
+                </div>
+            </div>
+            <div class="time">
+                <div class="time-nome">Time B</div>
+                <div class="pontos" id="pontosB">{{ time_b }}</div>
+                <div class="barra-container">
+                    <div class="barra" id="barraB" style="height: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const socket = io();
         
-        function atualizarGrafico() {
-            fetch('/grafico')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('grafico').src = 'data:image/png;base64,' + data;
-                });
+        function atualizarBarras(timeA, timeB) {
+            const total = Math.max(timeA, timeB, 1);
+            const alturaA = (timeA / total) * 100;
+            const alturaB = (timeB / total) * 100;
+            
+            document.getElementById('barraA').style.height = `${alturaA}%`;
+            document.getElementById('barraB').style.height = `${alturaB}%`;
+            document.getElementById('pontosA').textContent = timeA;
+            document.getElementById('pontosB').textContent = timeB;
         }
 
-        // Atualiza o gráfico quando receber novo comentário
-        socket.on('novo_comentario', function() {
-            atualizarGrafico();
+        function criarAnimacaoPonto(time) {
+            const barra = document.getElementById(`barra${time}`);
+            const animacao = document.createElement('div');
+            animacao.className = 'ponto-animacao';
+            animacao.textContent = '+1';
+            animacao.style.left = '50%';
+            animacao.style.bottom = '100%';
+            barra.appendChild(animacao);
+            
+            setTimeout(() => animacao.remove(), 1000);
+        }
+
+        socket.on('atualizar_pontos', function(data) {
+            const oldA = parseInt(document.getElementById('pontosA').textContent);
+            const oldB = parseInt(document.getElementById('pontosB').textContent);
+            
+            if (data.time_a > oldA) criarAnimacaoPonto('A');
+            if (data.time_b > oldB) criarAnimacaoPonto('B');
+            
+            atualizarBarras(data.time_a, data.time_b);
         });
 
-        // Atualiza o gráfico inicialmente
-        atualizarGrafico();
+        // Inicializar barras
+        atualizarBarras({{ time_a }}, {{ time_b }});
     </script>
 </body>
 </html> 
