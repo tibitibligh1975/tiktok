@@ -60,6 +60,38 @@ def webhook_time_b():
     
     return {'status': 'success'}, 200
 
+@app.route('/comando/timeA', methods=['POST'])
+def comando_time_a():
+    global time_a
+    
+    # Simplesmente adiciona 1 ponto
+    time_a += 1
+    
+    socketio.emit('atualizar_pontos', {
+        'time_a': time_a, 
+        'time_b': time_b,
+        'animacoes_a': 1,
+        'animacoes_b': 0
+    })
+    
+    return {'status': 'success'}, 200
+
+@app.route('/comando/timeB', methods=['POST'])
+def comando_time_b():
+    global time_b
+    
+    # Simplesmente adiciona 1 ponto
+    time_b += 1
+    
+    socketio.emit('atualizar_pontos', {
+        'time_a': time_a, 
+        'time_b': time_b,
+        'animacoes_a': 0,
+        'animacoes_b': 1
+    })
+    
+    return {'status': 'success'}, 200
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port) 
