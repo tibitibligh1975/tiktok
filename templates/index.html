@@ -239,9 +239,9 @@
             
             const imagem = document.createElement('img');
             if (time === 'A') {
-                imagem.src = "{{ url_for('static', filename='images/rosa.png') }}";
+                imagem.src = "{{ url_for('static', filename='images/rosa.webp') }}";
             } else {
-                imagem.src = "{{ url_for('static', filename='images/flor.png') }}";
+                imagem.src = "{{ url_for('static', filename='images/flor.webp') }}";
             }
             
             animacao.appendChild(imagem);
