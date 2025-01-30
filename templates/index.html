@@ -169,45 +169,48 @@
         const socket = io();
         let escalaAtual = 100; // Começa com escala de 0-100
         
-        function determinarProximaEscala(maximo) {
-            // Encontra a próxima escala adequada baseada no valor máximo
-            const escalas = [100, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
-            for (let escala of escalas) {
-                if (escala > maximo) {
-                    return escala;
-                }
-            }
-            // Se ultrapassar todas as escalas predefinidas, aumenta de 50000 em 50000
-            return Math.ceil(maximo / 50000) * 50000;
+        function determinarProximaEscala(escalaAtual) {
+            if (escalaAtual < 100) return 100;
+            if (escalaAtual === 100) return 500;
+            if (escalaAtual === 500) return 1000;
+            return Math.ceil(escalaAtual / 1000) * 1000 + 1000; // Aumenta de 1000 em 1000
         }
 
         function ajustarEscala(maximo) {
-            // Se o valor máximo ultrapassar 80% da escala atual
+            // Se algum valor atingir 80% da escala atual
             if (maximo >= escalaAtual * 0.8) {
-                escalaAtual = determinarProximaEscala(maximo);
+                escalaAtual = determinarProximaEscala(escalaAtual);
                 return true;
-            }
-            // Se o valor máximo for menor que 40% da escala atual e não estivermos na menor escala
-            else if (maximo < escalaAtual * 0.4 && escalaAtual > 100) {
-                const escalaAnterior = determinarProximaEscala(maximo);
-                if (escalaAnterior < escalaAtual) {
-                    escalaAtual = escalaAnterior;
-                    return true;
-                }
             }
             return false;
         }
 
         function criarEscala() {
             const divisoes = 7;
+            const incremento = escalaAtual / divisoes;
             const elementos = [];
             
-            // Calcula incrementos baseados na escala atual
-            for (let i = 0; i <= divisoes; i++) {
-                elementos.push(Math.round((escalaAtual * i) / divisoes));
+            for (let i = divisoes; i >= 0; i--) {
+                elementos.push(Math.round(incremento * i));
             }
             
             return elementos;
+        }
+
+        function atualizarEscala() {
+            const escalaA = document.getElementById('escalaA');
+            const escalaB = document.getElementById('escalaB');
+            const elementos = criarEscala();
+            
+            escalaA.innerHTML = '';
+            escalaB.innerHTML = '';
+            
+            elementos.forEach(valor => {
+                const elemento = document.createElement('div');
+                elemento.textContent = valor;
+                escalaA.appendChild(elemento.cloneNode(true));
+                escalaB.appendChild(elemento);
+            });
         }
 
         function formatarNumero(numero) {
@@ -226,17 +229,16 @@
             }
             
             // Calcula altura proporcional à escala atual
-            const alturaA = Math.min((timeA / escalaAtual) * 100, 100);
-            const alturaB = Math.min((timeB / escalaAtual) * 100, 100);
+            const alturaA = (timeA / escalaAtual) * 100;
+            const alturaB = (timeB / escalaAtual) * 100;
             
             const barraA = document.getElementById('barraA');
             const barraB = document.getElementById('barraB');
             
-            // Atualiza as alturas das barras
+            // Só mostra a barra se tiver pontos
             barraA.style.height = timeA > 0 ? `${alturaA}%` : '0';
             barraB.style.height = timeB > 0 ? `${alturaB}%` : '0';
             
-            // Atualiza os números
             document.getElementById('pontosA').innerHTML = formatarNumero(timeA);
             document.getElementById('pontosB').innerHTML = formatarNumero(timeB);
         }
