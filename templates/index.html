@@ -134,11 +134,50 @@
             font-size: 0.8em;
             margin-left: 5px;
         }
+
+        .legenda {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .legenda-esquerda {
+            left: -180px;
+        }
+
+        .legenda-direita {
+            right: -180px;
+        }
+
+        .item-legenda {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-legenda img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .comando {
+            color: #69c9d0;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="title">⭐ Placar da Live ⭐</h1>
+        <h1 class="title">Qual seu presidente para 2026?</h1>
         <div class="placar">
             <div class="time">
                 <div class="time-imagem">
@@ -147,8 +186,22 @@
                 <div class="time-nome">Lula</div>
                 <div class="pontos" id="pontosA">{{ time_a }}</div>
                 <div class="barra-container">
-                    <div class="barra" id="barraA" style="height: 0%"></div>
+                    <div class="barra" id="barraA"></div>
                     <div class="escala" id="escalaA"></div>
+                    <div class="legenda legenda-esquerda">
+                        <div class="item-legenda">
+                            <img src="{{ url_for('static', filename='images/rosa.webp') }}" alt="Rosa">
+                            <span>= 1 voto</span>
+                        </div>
+                        <div class="item-legenda">
+                            <img src="{{ url_for('static', filename='images/coracao.webp') }}" alt="Coração">
+                            <span>= 10 votos</span>
+                        </div>
+                        <div class="item-legenda">
+                            <span class="comando">/lula</span>
+                            <span>= 1 voto</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="time">
@@ -158,8 +211,22 @@
                 <div class="time-nome">Bolsonaro</div>
                 <div class="pontos" id="pontosB">{{ time_b }}</div>
                 <div class="barra-container">
-                    <div class="barra" id="barraB" style="height: 0%"></div>
+                    <div class="barra" id="barraB"></div>
                     <div class="escala" id="escalaB"></div>
+                    <div class="legenda legenda-direita">
+                        <div class="item-legenda">
+                            <img src="{{ url_for('static', filename='images/flor.webp') }}" alt="Flor">
+                            <span>= 1 voto</span>
+                        </div>
+                        <div class="item-legenda">
+                            <img src="{{ url_for('static', filename='images/dino.webp') }}" alt="Dino">
+                            <span>= 10 votos</span>
+                        </div>
+                        <div class="item-legenda">
+                            <span class="comando">/mito</span>
+                            <span>= 1 voto</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

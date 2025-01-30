@@ -18,20 +18,24 @@ def home():
 def webhook_time_a():
     global time_a
     
-    # Lê os dados do body
     body_data = request.get_data().decode('utf-8')
-    # Converte os dados do form para um dicionário
     data = parse_qs(body_data)
     
-    # Pega o primeiro valor da lista retornada pelo parse_qs
+    gift_name = data.get('giftName', [''])[0]
     coins = int(data.get('coins', [1])[0])
-    time_a += coins
     
-    # Envia o número de coins para determinar quantas animações fazer
+    # Verifica qual presente foi enviado
+    if gift_name == 'Coração':  # Ajuste o nome conforme aparecer no webhook
+        pontos = coins * 10  # Coração vale 10
+    else:
+        pontos = coins  # Rosa vale 1
+    
+    time_a += pontos
+    
     socketio.emit('atualizar_pontos', {
         'time_a': time_a, 
         'time_b': time_b,
-        'animacoes_a': coins,
+        'animacoes_a': pontos,
         'animacoes_b': 0
     })
     
@@ -41,21 +45,25 @@ def webhook_time_a():
 def webhook_time_b():
     global time_b
     
-    # Lê os dados do body
     body_data = request.get_data().decode('utf-8')
-    # Converte os dados do form para um dicionário
     data = parse_qs(body_data)
     
-    # Pega o primeiro valor da lista retornada pelo parse_qs
+    gift_name = data.get('giftName', [''])[0]
     coins = int(data.get('coins', [1])[0])
-    time_b += coins
     
-    # Envia o número de coins para determinar quantas animações fazer
+    # Verifica qual presente foi enviado
+    if gift_name == 'Dino':  # Ajuste o nome conforme aparecer no webhook
+        pontos = coins * 10  # Dino vale 10
+    else:
+        pontos = coins  # Flor vale 1
+    
+    time_b += pontos
+    
     socketio.emit('atualizar_pontos', {
         'time_a': time_a, 
         'time_b': time_b,
         'animacoes_a': 0,
-        'animacoes_b': coins
+        'animacoes_b': pontos
     })
     
     return {'status': 'success'}, 200
