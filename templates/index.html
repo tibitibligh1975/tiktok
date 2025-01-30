@@ -69,11 +69,8 @@
         }
 
         .barra-container {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            height: 300px;
             position: relative;
-            overflow: hidden;
+            margin-right: 60px; /* Espaço para a escala */
         }
 
         .barra {
@@ -104,6 +101,24 @@
                 opacity: 0;
             }
         }
+
+        .escala {
+            position: absolute;
+            right: -60px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .unidade {
+            color: #69c9d0;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +133,7 @@
                 <div class="pontos" id="pontosA">{{ time_a }}</div>
                 <div class="barra-container">
                     <div class="barra" id="barraA" style="height: 0%"></div>
+                    <div class="escala" id="escalaA"></div>
                 </div>
             </div>
             <div class="time">
@@ -128,6 +144,7 @@
                 <div class="pontos" id="pontosB">{{ time_b }}</div>
                 <div class="barra-container">
                     <div class="barra" id="barraB" style="height: 0%"></div>
+                    <div class="escala" id="escalaB"></div>
                 </div>
             </div>
         </div>
@@ -136,22 +153,50 @@
     <script>
         const socket = io();
         
+        function formatarNumero(numero) {
+            if (numero < 10) return numero.toFixed(1);
+            if (numero < 100) return numero.toFixed(0);
+            if (numero < 1000) return numero.toFixed(0);
+            if (numero < 1000000) return (numero/1000).toFixed(1) + 'K';
+            if (numero < 1000000000) return (numero/1000000).toFixed(1) + 'M';
+            return (numero/1000000000).toFixed(1) + 'B';
+        }
+
+        function atualizarEscala(maximo) {
+            const divisoes = 5;
+            const escalaA = document.getElementById('escalaA');
+            const escalaB = document.getElementById('escalaB');
+            
+            escalaA.innerHTML = '';
+            escalaB.innerHTML = '';
+            
+            for (let i = divisoes; i >= 0; i--) {
+                const valor = (maximo * i) / divisoes;
+                const elemento = document.createElement('div');
+                elemento.textContent = formatarNumero(valor);
+                escalaA.appendChild(elemento.cloneNode(true));
+                escalaB.appendChild(elemento);
+            }
+        }
+
         function atualizarBarras(timeA, timeB) {
-            const total = Math.max(timeA, timeB, 1);
-            const alturaA = (timeA / total) * 100;
-            const alturaB = (timeB / total) * 100;
+            const maximo = Math.max(timeA, timeB, 1);
+            const alturaA = (timeA / maximo) * 100;
+            const alturaB = (timeB / maximo) * 100;
             
             document.getElementById('barraA').style.height = `${alturaA}%`;
             document.getElementById('barraB').style.height = `${alturaB}%`;
-            document.getElementById('pontosA').textContent = timeA;
-            document.getElementById('pontosB').textContent = timeB;
+            document.getElementById('pontosA').innerHTML = `${formatarNumero(timeA)}`;
+            document.getElementById('pontosB').innerHTML = `${formatarNumero(timeB)}`;
+            
+            atualizarEscala(maximo);
         }
 
-        function criarAnimacaoPonto(time) {
+        function criarAnimacaoPonto(time, valor) {
             const barra = document.getElementById(`barra${time}`);
             const animacao = document.createElement('div');
             animacao.className = 'ponto-animacao';
-            animacao.textContent = '+1';
+            animacao.textContent = `+${formatarNumero(valor)}`;
             animacao.style.left = '50%';
             animacao.style.bottom = '100%';
             barra.appendChild(animacao);
@@ -160,11 +205,11 @@
         }
 
         socket.on('atualizar_pontos', function(data) {
-            const oldA = parseInt(document.getElementById('pontosA').textContent);
-            const oldB = parseInt(document.getElementById('pontosB').textContent);
+            const oldA = parseFloat(document.getElementById('pontosA').textContent);
+            const oldB = parseFloat(document.getElementById('pontosB').textContent);
             
-            if (data.time_a > oldA) criarAnimacaoPonto('A');
-            if (data.time_b > oldB) criarAnimacaoPonto('B');
+            if (data.time_a > oldA) criarAnimacaoPonto('A', data.time_a - oldA);
+            if (data.time_b > oldB) criarAnimacaoPonto('B', data.time_b - oldB);
             
             atualizarBarras(data.time_a, data.time_b);
         });
