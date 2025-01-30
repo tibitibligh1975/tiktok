@@ -68,6 +68,7 @@
             position: relative;
             margin-right: 60px;
             margin-top: 20px;
+            margin-left: 40px;
         }
 
         .barra {
@@ -83,7 +84,7 @@
 
         .escala {
             position: absolute;
-            right: -60px;
+            left: -40px;
             top: 0;
             height: 100%;
             display: flex;
@@ -168,44 +169,65 @@
 
     <script>
         const socket = io();
+        let escalaAtual = 10; // Começa com escala de 0-100
         
-        function formatarNumero(numero) {
-            if (numero < 10) return numero.toFixed(1);
-            if (numero < 100) return numero.toFixed(0);
-            if (numero < 1000) return numero.toFixed(0);
-            if (numero < 1000000) return (numero/1000).toFixed(1) + 'K';
-            if (numero < 1000000000) return (numero/1000000).toFixed(1) + 'M';
-            return (numero/1000000000).toFixed(1) + 'B';
+        function ajustarEscala(maximo) {
+            // Se algum valor atingir 80% da escala atual, aumentamos a escala
+            if (maximo >= escalaAtual * 0.8) {
+                escalaAtual *= 10;
+                return true;
+            }
+            return false;
         }
 
-        function atualizarEscala(maximo) {
-            const divisoes = 5;
+        function criarEscala() {
+            const divisoes = 7; // 7 divisões (30, 40, 50, 60, 70, 80, 90)
+            const incremento = escalaAtual / 10; // Incremento de 10 em 10
+            const elementos = [];
+            
+            for (let i = divisoes; i >= 0; i--) {
+                elementos.push(incremento * (i + 3)); // Começa do 30
+            }
+            
+            return elementos;
+        }
+
+        function atualizarEscala() {
             const escalaA = document.getElementById('escalaA');
             const escalaB = document.getElementById('escalaB');
+            const elementos = criarEscala();
             
             escalaA.innerHTML = '';
             escalaB.innerHTML = '';
             
-            for (let i = divisoes; i >= 0; i--) {
-                const valor = (maximo * i) / divisoes;
+            elementos.forEach(valor => {
                 const elemento = document.createElement('div');
-                elemento.textContent = formatarNumero(valor);
+                elemento.textContent = valor;
                 escalaA.appendChild(elemento.cloneNode(true));
                 escalaB.appendChild(elemento);
-            }
+            });
+        }
+
+        function formatarNumero(numero) {
+            return numero.toFixed(0);
         }
 
         function atualizarBarras(timeA, timeB) {
             const maximo = Math.max(timeA, timeB, 1);
-            const alturaA = (timeA / maximo) * 100;
-            const alturaB = (timeB / maximo) * 100;
+            
+            // Verifica se precisa ajustar a escala
+            if (ajustarEscala(maximo)) {
+                atualizarEscala();
+            }
+            
+            // Calcula altura proporcional à escala atual
+            const alturaA = (timeA / escalaAtual) * 100;
+            const alturaB = (timeB / escalaAtual) * 100;
             
             document.getElementById('barraA').style.height = `${alturaA}%`;
             document.getElementById('barraB').style.height = `${alturaB}%`;
-            document.getElementById('pontosA').innerHTML = `${formatarNumero(timeA)}`;
-            document.getElementById('pontosB').innerHTML = `${formatarNumero(timeB)}`;
-            
-            atualizarEscala(maximo);
+            document.getElementById('pontosA').innerHTML = formatarNumero(timeA);
+            document.getElementById('pontosB').innerHTML = formatarNumero(timeB);
         }
 
         function criarAnimacaoPonto(time, valor) {
@@ -249,7 +271,8 @@
             atualizarBarras(data.time_a, data.time_b);
         });
 
-        // Inicializar barras
+        // Inicializar barras e escala
+        atualizarEscala();
         atualizarBarras({{ time_a }}, {{ time_b }});
     </script>
 </body>
