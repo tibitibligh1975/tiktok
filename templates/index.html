@@ -216,9 +216,9 @@
             const imagem = document.createElement('img');
             // Define a imagem baseado no time
             if (time === 'A') {
-                imagem.src = "{{ url_for('static', filename='images/rosa.png') }}";
+                imagem.src = "{{ url_for('static', filename='images/rosa.webp') }}";
             } else {
-                imagem.src = "{{ url_for('static', filename='images/flor.png') }}";
+                imagem.src = "{{ url_for('static', filename='images/flor.webp') }}";
             }
             
             animacao.appendChild(imagem);
