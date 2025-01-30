@@ -18,14 +18,13 @@ def home():
 def webhook_time_a():
     global time_a
     
-    # Processa os dados do form
-    if request.content_type == 'application/x-www-form-urlencoded':
-        data = request.form
-    else:
-        data = request.get_json()
+    # Lê os dados do body
+    body_data = request.get_data().decode('utf-8')
+    # Converte os dados do form para um dicionário
+    data = parse_qs(body_data)
     
-    # Usa apenas o valor de coins para os pontos
-    coins = int(data.get('coins', 1))
+    # Pega o primeiro valor da lista retornada pelo parse_qs
+    coins = int(data.get('coins', [1])[0])
     time_a += coins
     
     # Envia o número de coins para determinar quantas animações fazer
@@ -42,14 +41,13 @@ def webhook_time_a():
 def webhook_time_b():
     global time_b
     
-    # Processa os dados do form
-    if request.content_type == 'application/x-www-form-urlencoded':
-        data = request.form
-    else:
-        data = request.get_json()
+    # Lê os dados do body
+    body_data = request.get_data().decode('utf-8')
+    # Converte os dados do form para um dicionário
+    data = parse_qs(body_data)
     
-    # Usa apenas o valor de coins para os pontos
-    coins = int(data.get('coins', 1))
+    # Pega o primeiro valor da lista retornada pelo parse_qs
+    coins = int(data.get('coins', [1])[0])
     time_b += coins
     
     # Envia o número de coins para determinar quantas animações fazer
