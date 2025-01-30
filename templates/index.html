@@ -35,7 +35,7 @@
         }
 
         .time {
-            width: 45%;
+            width: 30%;
         }
 
         .time-imagem {
@@ -71,8 +71,8 @@
         .barra {
             position: absolute;
             bottom: 0;
-            left: 0;
-            width: 100%;
+            left: 25%;
+            width: 50%;
             background: linear-gradient(45deg, #fe2c55, #69c9d0);
             transition: height 0.5s ease-out;
             border-radius: 10px;
@@ -137,41 +137,51 @@
 
         .legenda {
             position: absolute;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 15px;
             color: white;
-            font-size: 0.9em;
+            font-size: 1.1em;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
             top: 50%;
             transform: translateY(-50%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .legenda-esquerda {
-            left: -180px;
+            left: -220px;
         }
 
         .legenda-direita {
-            right: -180px;
+            right: -220px;
         }
 
         .item-legenda {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            padding: 5px 0;
         }
 
         .item-legenda img {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
         }
 
         .comando {
             color: #69c9d0;
             font-family: monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .item-legenda:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease;
         }
     </style>
 </head>
