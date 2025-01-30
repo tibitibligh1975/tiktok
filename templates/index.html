@@ -62,13 +62,10 @@
         }
 
         .barra-container {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
             height: 300px;
             position: relative;
-            margin-right: 60px;
-            margin-top: 20px;
             margin-left: 40px;
+            margin-top: 20px;
         }
 
         .barra {
@@ -80,6 +77,7 @@
             transition: height 0.5s ease-out;
             border-radius: 10px;
             z-index: 1;
+            min-height: 0;
         }
 
         .escala {
@@ -169,24 +167,31 @@
 
     <script>
         const socket = io();
-        let escalaAtual = 10; // Começa com escala de 0-100
+        let escalaAtual = 100; // Começa com escala de 0-100
         
+        function determinarProximaEscala(escalaAtual) {
+            if (escalaAtual < 100) return 100;
+            if (escalaAtual === 100) return 500;
+            if (escalaAtual === 500) return 1000;
+            return Math.ceil(escalaAtual / 1000) * 1000 + 1000; // Aumenta de 1000 em 1000
+        }
+
         function ajustarEscala(maximo) {
-            // Se algum valor atingir 80% da escala atual, aumentamos a escala
+            // Se algum valor atingir 80% da escala atual
             if (maximo >= escalaAtual * 0.8) {
-                escalaAtual *= 10;
+                escalaAtual = determinarProximaEscala(escalaAtual);
                 return true;
             }
             return false;
         }
 
         function criarEscala() {
-            const divisoes = 7; // 7 divisões (30, 40, 50, 60, 70, 80, 90)
-            const incremento = escalaAtual / 10; // Incremento de 10 em 10
+            const divisoes = 7;
+            const incremento = escalaAtual / divisoes;
             const elementos = [];
             
             for (let i = divisoes; i >= 0; i--) {
-                elementos.push(incremento * (i + 3)); // Começa do 30
+                elementos.push(Math.round(incremento * i));
             }
             
             return elementos;
@@ -209,7 +214,10 @@
         }
 
         function formatarNumero(numero) {
-            return numero.toFixed(0);
+            if (numero === 0) return "0";
+            if (numero < 1000) return numero.toString();
+            if (numero < 1000000) return (numero/1000).toFixed(1) + 'K';
+            return (numero/1000000).toFixed(1) + 'M';
         }
 
         function atualizarBarras(timeA, timeB) {
@@ -224,8 +232,13 @@
             const alturaA = (timeA / escalaAtual) * 100;
             const alturaB = (timeB / escalaAtual) * 100;
             
-            document.getElementById('barraA').style.height = `${alturaA}%`;
-            document.getElementById('barraB').style.height = `${alturaB}%`;
+            const barraA = document.getElementById('barraA');
+            const barraB = document.getElementById('barraB');
+            
+            // Só mostra a barra se tiver pontos
+            barraA.style.height = timeA > 0 ? `${alturaA}%` : '0';
+            barraB.style.height = timeB > 0 ? `${alturaB}%` : '0';
+            
             document.getElementById('pontosA').innerHTML = formatarNumero(timeA);
             document.getElementById('pontosB').innerHTML = formatarNumero(timeB);
         }
@@ -272,7 +285,7 @@
             atualizarBarras(data.time_a, data.time_b);
         });
 
-        // Inicializar barras e escala
+        // Inicializar
         atualizarEscala();
         atualizarBarras({{ time_a }}, {{ time_b }});
     </script>
