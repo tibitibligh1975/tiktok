@@ -38,10 +38,27 @@
             width: 45%;
         }
 
+        .time-imagem {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #fe2c55;
+            box-shadow: 0 0 20px rgba(254, 44, 85, 0.3);
+        }
+
+        .time-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .time-nome {
             color: #fff;
             font-size: 1.8em;
             margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
 
         .pontos {
@@ -94,14 +111,20 @@
         <h1 class="title">⭐ Placar da Live ⭐</h1>
         <div class="placar">
             <div class="time">
-                <div class="time-nome">Time A</div>
+                <div class="time-imagem">
+                    <img src="{{ url_for('static', filename='images/lula.png') }}" alt="Lula">
+                </div>
+                <div class="time-nome">Lula</div>
                 <div class="pontos" id="pontosA">{{ time_a }}</div>
                 <div class="barra-container">
                     <div class="barra" id="barraA" style="height: 0%"></div>
                 </div>
             </div>
             <div class="time">
-                <div class="time-nome">Time B</div>
+                <div class="time-imagem">
+                    <img src="{{ url_for('static', filename='images/bolsonaro.png') }}" alt="Bolsonaro">
+                </div>
+                <div class="time-nome">Bolsonaro</div>
                 <div class="pontos" id="pontosB">{{ time_b }}</div>
                 <div class="barra-container">
                     <div class="barra" id="barraB" style="height: 0%"></div>
