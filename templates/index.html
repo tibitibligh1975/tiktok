@@ -61,25 +61,46 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
 
-        .pontos {
-            font-size: 3em;
-            color: #fe2c55;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
         .barra-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 300px;
             position: relative;
-            margin-right: 60px; /* Espaço para a escala */
+            margin-right: 60px;
+            margin-top: 20px;
         }
 
         .barra {
             position: absolute;
             bottom: 0;
+            left: 0;
             width: 100%;
             background: linear-gradient(45deg, #fe2c55, #69c9d0);
             transition: height 0.5s ease-out;
             border-radius: 10px;
+            z-index: 1;
+        }
+
+        .escala {
+            position: absolute;
+            right: -60px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 0.8em;
+            opacity: 0.7;
+            z-index: 2;
+        }
+
+        .pontos {
+            font-size: 3em;
+            color: #fe2c55;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(254, 44, 85, 0.3);
         }
 
         .ponto-animacao {
@@ -89,6 +110,7 @@
             font-weight: bold;
             animation: subir 1s ease-out forwards;
             opacity: 0;
+            z-index: 3;
         }
 
         @keyframes subir {
@@ -100,18 +122,6 @@
                 transform: translateY(-50px);
                 opacity: 0;
             }
-        }
-
-        .escala {
-            position: absolute;
-            right: -60px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            color: #fff;
-            font-size: 0.8em;
-            opacity: 0.7;
         }
 
         .unidade {
