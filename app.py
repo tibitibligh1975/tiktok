@@ -24,18 +24,15 @@ def webhook_time_a():
     else:
         data = request.get_json()
     
-    # Calcula pontos baseado em coins e repeatCount
+    # Usa apenas o valor de coins para os pontos
     coins = int(data.get('coins', 1))
-    repeat_count = int(data.get('repeatCount', 1))
-    total_points = coins * repeat_count
+    time_a += coins
     
-    time_a += total_points
-    
-    # Envia o número total de pontos e quantas animações fazer
+    # Envia o número de coins para determinar quantas animações fazer
     socketio.emit('atualizar_pontos', {
         'time_a': time_a, 
         'time_b': time_b,
-        'animacoes_a': total_points,
+        'animacoes_a': coins,
         'animacoes_b': 0
     })
     
@@ -51,19 +48,16 @@ def webhook_time_b():
     else:
         data = request.get_json()
     
-    # Calcula pontos baseado em coins e repeatCount
+    # Usa apenas o valor de coins para os pontos
     coins = int(data.get('coins', 1))
-    repeat_count = int(data.get('repeatCount', 1))
-    total_points = coins * repeat_count
+    time_b += coins
     
-    time_b += total_points
-    
-    # Envia o número total de pontos e quantas animações fazer
+    # Envia o número de coins para determinar quantas animações fazer
     socketio.emit('atualizar_pontos', {
         'time_a': time_a, 
         'time_b': time_b,
         'animacoes_a': 0,
-        'animacoes_b': total_points
+        'animacoes_b': coins
     })
     
     return {'status': 'success'}, 200
