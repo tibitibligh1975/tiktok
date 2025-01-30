@@ -230,23 +230,24 @@
             document.getElementById('pontosB').innerHTML = formatarNumero(timeB);
         }
 
-        function criarAnimacaoPonto(time, valor) {
+        function criarAnimacaoPonto(time, quantidade) {
+            if (quantidade <= 0) return;
+            
             const barra = document.getElementById(`barra${time}`);
             const animacao = document.createElement('div');
             animacao.className = 'ponto-animacao';
             
             const imagem = document.createElement('img');
-            // Define a imagem baseado no time
             if (time === 'A') {
-                imagem.src = "{{ url_for('static', filename='images/rosa.webp') }}";
+                imagem.src = "{{ url_for('static', filename='images/rosa.png') }}";
             } else {
-                imagem.src = "{{ url_for('static', filename='images/flor.webp') }}";
+                imagem.src = "{{ url_for('static', filename='images/flor.png') }}";
             }
             
             animacao.appendChild(imagem);
             
             // Posição aleatória horizontal dentro da barra
-            const randomX = Math.random() * 80 + 10; // entre 10% e 90% da largura
+            const randomX = Math.random() * 80 + 10;
             animacao.style.left = `${randomX}%`;
             animacao.style.bottom = '20%';
             
@@ -255,18 +256,18 @@
             // Remove o elemento após a animação
             setTimeout(() => animacao.remove(), 1000);
             
-            // Cria múltiplas animações para valores maiores
-            if (valor > 1) {
-                setTimeout(() => criarAnimacaoPonto(time, valor - 1), 200);
-            }
+            // Cria a próxima animação com um pequeno delay
+            setTimeout(() => criarAnimacaoPonto(time, quantidade - 1), 200);
         }
 
         socket.on('atualizar_pontos', function(data) {
-            const oldA = parseFloat(document.getElementById('pontosA').textContent);
-            const oldB = parseFloat(document.getElementById('pontosB').textContent);
-            
-            if (data.time_a > oldA) criarAnimacaoPonto('A', data.time_a - oldA);
-            if (data.time_b > oldB) criarAnimacaoPonto('B', data.time_b - oldB);
+            // Cria animações baseado no número recebido
+            if (data.animacoes_a > 0) {
+                criarAnimacaoPonto('A', data.animacoes_a);
+            }
+            if (data.animacoes_b > 0) {
+                criarAnimacaoPonto('B', data.animacoes_b);
+            }
             
             atualizarBarras(data.time_a, data.time_b);
         });
